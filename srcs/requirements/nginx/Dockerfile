@@ -1,6 +1,6 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y nginx openssl && apt-get clean
+RUN apt update && apt upgrade && apt install -y \nginx
 
 # Generate self-signed certificates
 RUN mkdir -p /etc/ssl/certs && \
