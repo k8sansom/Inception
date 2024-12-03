@@ -4,7 +4,7 @@ services:
   nginx:
     build:
       context: requirements/nginx/.
-      dockerfile: Dockerfile
+
     container_name: nginx
     ports:
       - "80:80"
@@ -17,44 +17,44 @@ services:
 #      - wordpress
 #    restart: always
 
-  wordpress:
-    build:
-      context: ./wordpress
-      dockerfile: Dockerfile
-    container_name: wordpress
-    environment:
-      WORDPRESS_DB_HOST: mariadb
-      WORDPRESS_DB_USER: wp_user
-      WORDPRESS_DB_PASSWORD: wp_password
-      WORDPRESS_DB_NAME: wp_database
-    volumes:
-      - wp_files:/var/www/html
-    networks:
-      - wp_network
-    depends_on:
-      - mariadb
-    restart: always
+#  wordpress:
+#    build:
+#      context: ./wordpress
+#      dockerfile: Dockerfile
+#    container_name: wordpress
+#    environment:
+#      WORDPRESS_DB_HOST: mariadb
+#      WORDPRESS_DB_USER: wp_user
+#      WORDPRESS_DB_PASSWORD: wp_password
+#      WORDPRESS_DB_NAME: wp_database
+#    volumes:
+#      - wp_files:/var/www/html
+#    networks:
+#      - wp_network
+#    depends_on:
+#      - mariadb
+#    restart: always
 
-  mariadb:
-    build:
-      context: ./mariadb
-      dockerfile: Dockerfile
-    container_name: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: wp_database
-      MYSQL_USER: wp_user
-      MYSQL_PASSWORD: wp_password
-    volumes:
-      - wp_data:/var/lib/mysql
-    networks:
-      - wp_network
-    restart: always
+#  mariadb:
+#    build:
+#      context: ./mariadb
+#      dockerfile: Dockerfile
+#    container_name: mariadb
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root_password
+#      MYSQL_DATABASE: wp_database
+#      MYSQL_USER: wp_user
+#      MYSQL_PASSWORD: wp_password
+#    volumes:
+#      - wp_data:/var/lib/mysql
+#    networks:
+#      - wp_network
+#    restart: always
 
-volumes:
-  wp_data:
-  wp_files:
+#volumes:
+#  wp_data:
+#  wp_files:
 
-networks:
-  wp_network:
+#networks:
+#  wp_network:
 
