@@ -1,14 +1,8 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y \
-    php-fpm php-mysql php-curl php-json php-xml php-mbstring wget unzip && \
-    apt-get clean
+# Install PHP 8.2 and PHP-FPM
+RUN apt update && apt upgrade -y && apt install -y \
+    php-fpm
 
-# Download WordPress
-WORKDIR /var/www/html
-RUN wget https://wordpress.org/latest.zip && unzip latest.zip && mv wordpress/* . && rm -rf wordpress latest.zip
-
-# Configure PHP-FPM
-RUN sed -i 's/;daemonize = yes/daemonize = no/' /etc/php/7.4/fpm/php-fpm.conf
-
-CMD ["php-fpm7.4", "-F"]
+# Start PHP-FPM
+CMD ["php-fpm", "-F"]

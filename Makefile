@@ -1,17 +1,11 @@
-.PHONY: all build up down clean restart
+all:
+	docker-compose -f docker-compose.yml up --build
 
-all: build up
+clean:
+	docker-compose down --volumes --remove-orphans
+	rm -rf /home/yourlogin/data/db /home/yourlogin/data/wp
 
-build:
-	docker-compose build
+fclean: clean
+	docker rmi $(docker images -q)
 
-up:
-	docker-compose up -d
-
-down:
-	docker-compose down
-
-clean: down
-	docker volume rm $(docker volume ls -q | grep wp)
-
-restart: down up
+re: fclean all

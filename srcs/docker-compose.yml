@@ -1,13 +1,11 @@
-version: '3.8'
+version: "3"
 
 services:
   nginx:
-    build:
-      context: requirements/nginx/.
-
+    build: requirements/nginx/.
     container_name: nginx
     ports:
-      - "80:80"
+      - "8080:80"
 #    volumes:
 #      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 #      - ./nginx/certs:/etc/ssl/certs
@@ -17,11 +15,9 @@ services:
 #      - wordpress
 #    restart: always
 
-#  wordpress:
-#    build:
-#      context: ./wordpress
-#      dockerfile: Dockerfile
-#    container_name: wordpress
+  wordpress:
+    build: requirements/wordpress/.
+    container_name: wp-php
 #    environment:
 #      WORDPRESS_DB_HOST: mariadb
 #      WORDPRESS_DB_USER: wp_user
