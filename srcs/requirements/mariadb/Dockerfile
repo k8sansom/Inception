@@ -1,7 +1,10 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y mariadb-server && apt-get clean
+RUN apt-get update && apt-get install -y \
+	mariadb-server -y && \
+	rm -rf /var/lib/apt/lists/*
 
-COPY init.sql /docker-entrypoint-initdb.d/
+RUN rm /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d
 
-CMD ["myscript"]
+CMD ["mysqld_safe"]

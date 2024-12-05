@@ -1,63 +1,62 @@
 version: '3.9'
 
+networks:
+  inception: {}
+
 services:
-#    env_file: .env
-#    volumes:
-#      - wp_files:/var/www/html
-#    networks:
-#      - wp_network
-#   depends_on:
-#      - mariadb
-#    restart: always
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      args:
+        - DB_NAME=${DB_NAME}
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD=${DB_PASSWORD}
+        - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    networks:
+      - inception
+    volumes:
+      - mariadb_v:/var/lib/mysql
+    restart: unless-stopped
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    networks:
+      - inception
+    volumes:
+      - wordpress_v:/var/www/wordpress
+    env_file: .env
+    depends_on:
+      - mariadb
+    restart: unless-stopped
 
   nginx:
-    build: requirements/nginx/.
     container_name: nginx
+    build: ./requirements/nginx
     ports:
-      - "8080:80"
+      - "443:443"
+      - "80:80"
+    networks:
+      - inception
     volumes:
-      - ./web:/var/www/html
-  wordpress:
-    build: requirements/wordpress/.
-    container_name: wp-php
-    volumes:
-      - ./web:/var/www/html
-    # volumes:
-    #   - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    #   - ./nginx/certs:/etc/ssl/certs
-    # networks:
-    #   - wp_network
-    # depends_on:
-    #   - wordpress
-    # restart: always
+      - wordpress_v:/var/www/wordpress
+    depends_on:
+      - wordpress
+    restart: unless-stopped
 
-#  mariadb:
-#    build: requirements/mariadb
-#    container_name: mariadb
-#    env_file: .env
-#    volumes:
-#       - wp_data:/var/lib/mysql
-#     networks:
-#       - wp_network
-#     restart: always
+volumes:
+  mariadb_v:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ksansom/data/mariadb
 
-# volumes:
-#   db:
-#     name: db
-#     driver: local
-#     driver_opts:
-#       type: none
-#       o: bind
-#       device: /home/${USER}/data/db
-#   wp:
-#     name: wp
-#     driver: local
-#     driver_opts:
-#       type: none
-#       o: bind
-#       device: /home/${USER}/data/wp
-
-networks:
-  project:
-    driver: bridge
+  wordpress_v:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ksansom/wordpress_data
 
