@@ -1,61 +1,22 @@
 version: '3.9'
  
-# networks:
-#   inception: {}
-#
 services:
-#   mariadb:
-#     container_name: mariadb
-#     build:
-#       context: ./requirements/mariadb
-#       args:
-#         - DB_NAME=${DB_NAME}
-#         - DB_USER=${DB_USER}
-#         - DB_PASSWORD=${DB_PASSWORD}
-#         - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-#     networks:
-#       - inception
-#     volumes:
-#       - mariadb_v:/var/lib/mysql
-#     restart: unless-stopped
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
 
   wordpress:
     container_name: wp-php
     build: ./requirements/wordpress
-#     networks:
-#       - inception
     volumes:
       - ./web:/var/www/html
-#     env_file: .env
-#     depends_on:
-#       - mariadb
-#     restart: unless-stopped
 
   nginx:
     container_name: nginx
     build: ./requirements/nginx
     ports:
       - "8080:80"
-    # networks:
-    #   - inception
     volumes:
       - ./web:/var/www/html
-    # depends_on:
-    #   - wordpress
-    # restart: unless-stopped
-
-# volumes:
-#   mariadb_v:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       o: bind
-#       device: /home/ksansom/data/mariadb
-
-#   wordpress_v:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       o: bind
-#       device: /home/ksansom/wordpress_data
 

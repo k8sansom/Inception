@@ -1,28 +1,47 @@
-all:
-	@sudo hostsed add 127.0.0.1 ksansom.42.fr && echo "successfully added ksansom.42.fr to /etc/hosts"
-	sudo docker compose -f ./srcs/docker-compose.yml up -d
+# Variables
+DOCKER_COMPOSE = docker-compose
+COMPOSE_FILE = ./srcs/docker-compose.yml
+WEB_DIR = ./srcs/web
 
+# Targets
+.PHONY: all up build start stop down clean fclean re
+
+# Default target: build and start services
+all: build up
+
+# Build services
+build:
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) build
+
+# Start services in the foreground
+up:
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up
+
+# Start services in detached mode
+start:
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d
+
+# Stop services
+stop:
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) stop
+
+# Stop and remove containers, networks, and volumes
+down:
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down
+
+# Clean up unused Docker resources (containers, images, volumes)
 clean:
-	sudo docker compose -f ./srcs/docker-compose.yml down --rmi all -v
-#	uncomment the following line to remove the images too
-#   sudo docker system prune -a
+	docker system prune -af
+	docker volume prune -f
 
-fclean: clean
-	@sudo hostsed rm 127.0.0.1 ksansom.42.fr && echo "successfully removed ksansom.42.fr to /etc/hosts"
-	@if [ -d "/home/ksansom/data/wordpress" ]; then \
-	sudo rm -rf /home/ksansom/data/wordpress/* && \
-	echo "successfully removed all contents from /home/ksansom/data/wordpress/"; \
-	fi;
+# Remove all containers, images, and volumes related to the project
+fclean: down
+	# Remove all images related to the project if any exist
+	@image_ids=$(docker images -q) && [ -n "$$image_ids" ] && docker rmi -f $$image_ids || echo "No images to remove"
+	# Remove all unused volumes
+	docker volume rm $$(docker volume ls -q) || true
+	rm -rf $(WEB_DIR)/*
 
-	@if [ -d "/home/ksansom/data/mariadb" ]; then \
-	sudo rm -rf /home/ksansom/data/mariadb/* && \
-	echo "successfully removed all contents from /home/ksansom/data/mariadb/"; \
-	fi;
-
+# Rebuild and restart services
 re: fclean all
 
-ls:
-	sudo docker image ls
-	sudo docker ps
-
-.PHONY: all, clean, fclean, re, ls
