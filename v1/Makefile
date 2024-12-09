@@ -36,11 +36,8 @@ clean:
 
 # Remove all containers, images, and volumes related to the project
 fclean: down
-	# Remove all images related to the project if any exist
 	@image_ids=$$(sudo docker images -q) && [ -n "$$image_ids" ] && sudo docker rmi -f $$image_ids || echo "No images to remove"
-	# Remove all unused volumes
 	sudo docker volume rm $$(sudo docker volume ls -q) || true
-	rm -rf $(WEB_DIR)/*
 
 # Rebuild and restart services
 re: fclean all
