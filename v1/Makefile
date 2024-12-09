@@ -1,5 +1,5 @@
 # Variables
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = sudo docker-compose
 COMPOSE_FILE = ./srcs/docker-compose.yml
 WEB_DIR = ./srcs/web
 
@@ -31,17 +31,16 @@ down:
 
 # Clean up unused Docker resources (containers, images, volumes)
 clean:
-	docker system prune -af
-	docker volume prune -f
+	sudo docker system prune -af
+	sudo docker volume prune -f
 
 # Remove all containers, images, and volumes related to the project
 fclean: down
 	# Remove all images related to the project if any exist
-	@image_ids=$(docker images -q) && [ -n "$$image_ids" ] && docker rmi -f $$image_ids || echo "No images to remove"
+	@image_ids=$$(sudo docker images -q) && [ -n "$$image_ids" ] && sudo docker rmi -f $$image_ids || echo "No images to remove"
 	# Remove all unused volumes
-	docker volume rm $$(docker volume ls -q) || true
+	sudo docker volume rm $$(sudo docker volume ls -q) || true
 	rm -rf $(WEB_DIR)/*
 
 # Rebuild and restart services
 re: fclean all
-
