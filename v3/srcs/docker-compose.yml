@@ -28,15 +28,14 @@ services:
     restart: always
 
   nginx:
-    container_name: nginx
     build: ./requirements/nginx
     ports:
       - "443:443"
+    volumes:
+      - ./requirements/nginx/ssl:/etc/nginx/ssl
     depends_on:
       - wordpress
-    volumes:
-      - wordpress_data:/var/www/html
-    restart: always
+
 
 volumes:
   mariadb_data:
