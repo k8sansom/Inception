@@ -1,4 +1,7 @@
 #!/bin/bash
 
-mysql_install_db
-mysqld
+# Initialize the MariaDB database
+mysqld --initialize-insecure --user=mysql
+
+# Start MariaDB service
+mysqld_safe
