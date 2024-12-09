@@ -7,6 +7,9 @@ RUN apt-get update && apt-get install -y \
     openssl \
     && rm -rf /var/lib/apt/lists/*
 
+# Create the ssl directory inside the container
+RUN mkdir -p /etc/nginx/ssl
+
 # Copy the ssl directory into the container
 COPY ./ssl /etc/nginx/ssl
 
