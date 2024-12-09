@@ -24,6 +24,11 @@ RUN chmod +x /config.sh
 # Set the default working directory
 WORKDIR /var/www/html
 
+# Set permissions on the /var/www/html directory
+RUN chown -R www-data:www-data /var/www/html && \
+    find /var/www/html -type d -exec chmod 755 {} \; && \
+    find /var/www/html -type f -exec chmod 644 {} \;
+	
 # Set the command to run the configuration script
 CMD ["/config.sh"]
 

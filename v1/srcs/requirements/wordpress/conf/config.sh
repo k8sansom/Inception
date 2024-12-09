@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Set permissions for /var/www/html just in case
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
+
 # Set up the working directory for WordPress
 cd /var/www/html
 
