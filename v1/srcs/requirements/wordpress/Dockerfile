@@ -1,21 +1,29 @@
 # Use debian:bullseye as the base image
 FROM debian:bullseye
 
-# Expose port 9000 for PHP-FPM
-# EXPOSE 9000
-# 
-# Install PHP 7.3 (or 7.4, 8.0 depending on availability), mariadb-client, curl
+# Install PHP, MariaDB client, and required tools
 RUN apt-get update && apt-get install -y \
     php7.4-fpm \
-    php-mysqli \
-    curl
+    php7.4-mysql \
+    curl \
+    unzip \
+    wget
 
-RUN mkdir /run/php
-RUN rm -rf /var/www/html/*
-# Copy the PHP-FPM pool configuration file
+# Create necessary directories and clean the web root
+RUN mkdir /run/php && \
+    mkdir -p /var/www/html && \
+    rm -rf /var/www/html/*
+
+# Copy PHP-FPM pool configuration
 COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
 
-COPY ./conf/config.sh .
-RUN chmod +x config.sh
-# Set the default command to run the config script
-CMD ["./config.sh"]
+# Copy the configuration script
+COPY ./conf/config.sh /config.sh
+RUN chmod +x /config.sh
+
+# Set the default working directory
+WORKDIR /var/www/html
+
+# Set the command to run the configuration script
+CMD ["/config.sh"]
+
