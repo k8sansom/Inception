@@ -1,28 +1,47 @@
-all:
-	@sudo hostsed add 127.0.0.1 tblaase.42.fr && echo "successfully added tblaase.42.fr to /etc/hosts"
-	sudo docker compose -f ./srcs/docker-compose.yml up -d
+NAME := inception
+
+wp_volume=/home/${USER}/data/wordpress
+mariadb_volume=/home/${USER}/data/mariadb
+
+all: ${NAME}
+
+${NAME}:
+	mkdir -p $(wp_volume)
+	mkdir -p $(mariadb_volume)
+	docker compose -f ./srcs/docker-compose.yml up --build 
+
+up:
+	mkdir -p $(wp_volume)
+	mkdir -p $(mariadb_volume)
+	docker compose -f ./srcs/docker-compose.yml up -d --build 
+
+down:
+	docker compose -f ./srcs/docker-compose.yml down
+
+stop:
+	docker compose -f ./srcs/docker-compose.yml stop
+
+start:
+	docker compose -f ./srcs/docker-compose.yml start
+
+restart: down up
+
+logs:
+	docker compose -f ./srcs/docker-compose.yml logs
+
+ps:
+	docker compose -f ./srcs/docker-compose.yml ps
 
 clean:
-	sudo docker compose -f ./srcs/docker-compose.yml down --rmi all -v
-#	uncomment the following line to remove the images too
-#	sudo docker system prune -a
+	@docker-compose down
+	@docker image prune -f
+	@docker container prune -f
+	@docker network prune -f
+	@docker system prune -af
 
 fclean: clean
-	@sudo hostsed rm 127.0.0.1 tblaase.42.fr && echo "successfully removed tblaase.42.fr to /etc/hosts"
-	@if [ -d "/home/tblaase/data/wordpress" ]; then \
-	sudo rm -rf /home/tblaase/data/wordpress/* && \
-	echo "successfully removed all contents from /home/tblaase/data/wordpress/"; \
-	fi;
+	@docker volume prune -af
 
-	@if [ -d "/home/tblaase/data/mariadb" ]; then \
-	sudo rm -rf /home/tblaase/data/mariadb/* && \
-	echo "successfully removed all contents from /home/tblaase/data/mariadb/"; \
-	fi;
+re: fclean ${NAME}
 
-re: fclean all
-
-ls:
-	sudo docker image ls
-	sudo docker ps
-
-.PHONY: all, clean, fclean, re, ls
+.PHONY: all up down restart logs ps build clean fclean re
