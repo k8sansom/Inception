@@ -13,7 +13,7 @@ ${NAME}:
 up:
 	mkdir -p $(wp_volume)
 	mkdir -p $(mariadb_volume)
-	docker compose -f ./srcs/docker-compose.yml up -d --build 
+	docker compose -f /srcs/docker-compose.yml up -d --build 
 
 down:
 	docker compose -f ./srcs/docker-compose.yml down
@@ -33,7 +33,7 @@ ps:
 	docker compose -f ./srcs/docker-compose.yml ps
 
 clean:
-	@docker-compose down
+	@docker compose -f ./srcs/docker-compose.yml down
 	@docker image prune -f
 	@docker container prune -f
 	@docker network prune -f
