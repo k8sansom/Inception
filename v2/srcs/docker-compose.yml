@@ -17,6 +17,11 @@ services:
     restart: on-failure
     expose:
       - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_USER_FILE: /run/secrets/db_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_DATABASE: wordpress
 
   wordpress:
     container_name: wordpress
@@ -39,6 +44,17 @@ services:
       - mariadb
     expose:
       - "8443"
+    ports:
+      - "8443:443"
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER_FILE: /run/secrets/db_user
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+      WORDPRESS_DB_NAME: wordpress
+      WP_ADMIN_USER_FILE: /run/secrets/wp_admin_user
+      WP_ADMIN_PASSWORD_FILE: /run/secrets/wp_admin_password
+      WP_USER_FILE: /run/secrets/wp_user
+      WP_USER_PASSWORD_FILE: /run/secrets/wp_user_password
 
 secrets:
   db_user:
