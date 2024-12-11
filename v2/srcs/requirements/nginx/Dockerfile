@@ -1,14 +1,17 @@
-FROM debian:buster
+FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y \
 	nginx \
-	openssl && \
-	rm -rf /var/lib/apt/lists/*
+	openssl
 
-COPY ./conf/nginx.conf /etc/nginx/sites-available/default
+RUN mkdir -p /etc/nginx/ssl && mkdir -p /var/www/html
 
-RUN openssl req -x509 -days 365 -nodes -newkey rsa:4096 \
-	-keyout /etc/ssl/private/nginx.key \
-	-out /etc/ssl/certs/nginx.crt -sha256 -subj "/CN=tblaase.42.fr"
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=Berlin/L=Berlin/O=42/OU=42/CN=ksansom/UID=ksansom/"
+
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+
+RUN chmod 755 /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html
 
 CMD ["nginx", "-g", "daemon off;"]
