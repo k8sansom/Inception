@@ -1,41 +1,93 @@
-version: '3.9'
+x-common: &default-config
+  env_file:
+    - .env
+  restart: on-failure
+  networks:
+    - inception
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: '/home/${USER}/data/wordpress'
+
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: '/home/${USER}/data/mariadb'
+
+secrets:
+  mariadb_user:
+    file: ../secrets/mariadb_user.txt
+  mariadb_root_pass:
+    file: ../secrets/mariadb_root_pass.txt
+  mariadb_pass:
+    file: ../secrets/mariadb_pass.txt
+  wp_admin:
+    file: ../secrets/wp_admin.txt
+  wp_admin_pass:
+    file: ../secrets/wp_admin_pass.txt
+  wp_user:
+    file: ../secrets/wp_user.txt
+  wp_user_pass:
+    file: ../secrets/wp_user_pass.txt
 
 services:
   mariadb:
+    <<: *default-config
     container_name: mariadb
+    volumes:
+      - mariadb:/var/lib/mysql
     build:
-      context: ./requirements/mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql
-
-  wordpress:
-    container_name: wp-php
-    build: ./requirements/wordpress
-    depends_on:
-      - mariadb
-    environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-    volumes:
-      - wordpress_data:/var/www/html
-
+      context: requirements/mariadb
+      dockerfile: Dockerfile
+    secrets:
+      - mariadb_user
+      - mariadb_root_pass
+      - mariadb_pass
+    # expose:
+    #   - "3306"
+  
   nginx:
+    <<: *default-config
     container_name: nginx
-    build: ./requirements/nginx
-    ports:
-      - "8080:80"
     depends_on:
       - wordpress
     volumes:
-      - wordpress_data:/var/www/html
-
-volumes:
-  mariadb_data:
-  wordpress_data:
+      - wordpress:/var/www/wordpress
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+      - "8080:8080"
+  
+  wordpress:
+    <<: *default-config
+    container_name: wordpress
+    volumes:
+    - wordpress:/var/www/wordpress
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+    secrets:
+      - mariadb_user
+      - mariadb_pass
+      - wp_admin
+      - wp_admin_pass
+      - wp_user
+      - wp_user_pass
+    depends_on:
+      - mariadb
+    # ports:
+    #   - "8443:443"
+    # expose:
+    #   - "8443"

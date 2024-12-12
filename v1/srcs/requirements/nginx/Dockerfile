@@ -1,14 +1,17 @@
 FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y \
-	nginx
+	nginx \
+	openssl
 
-# Set proper permissions for /var/www/html to ensure Nginx can access it
-RUN mkdir -p /var/www/html && \
-    chown -R www-data:www-data /var/www/html && \
-    find /var/www/html -type d -exec chmod 755 {} \; && \
-    find /var/www/html -type f -exec chmod 644 {} \;
-	
-COPY ./conf/nginx.conf /etc/nginx/sites-available/.
+RUN mkdir -p /etc/nginx/ssl && mkdir -p /var/www/html
+
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=Berlin/L=Berlin/O=42/OU=42/CN=ksansom/UID=ksansom/"
+
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+
+RUN chmod 755 /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html
 
 CMD ["nginx", "-g", "daemon off;"]

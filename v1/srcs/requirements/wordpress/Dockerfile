@@ -1,33 +1,18 @@
-# Use debian:bullseye as the base image
 FROM debian:bullseye
 
-# Install PHP, MariaDB client, and required tools
-RUN apt-get update && apt-get install -y \
-    php7.4-fpm \
-    php7.4-mysql \
-    curl \
-    unzip \
-    wget
+RUN apt update -y && apt upgrade -y && apt-get -y install wget unzip php7.4 php-fpm php-mysql mariadb-client \
+    php-redis && rm -rf /var/lib/apt/lists/*
+RUN wget https://wordpress.org/latest.zip -P /var/www
 
-# Create necessary directories and clean the web root
-RUN mkdir /run/php && \
-    mkdir -p /var/www/html && \
-    rm -rf /var/www/html/*
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-# Copy PHP-FPM pool configuration
-COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
+RUN cd var/www && unzip latest.zip && rm latest.zip
 
-# Copy the configuration script
-COPY ./conf/config.sh /config.sh
+RUN chown -R root:root /var/www && wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x wp-cli.phar
+RUN mv wp-cli.phar /usr/local/bin/wp
+
+COPY tools/config.sh /config.sh
 RUN chmod +x /config.sh
 
-# Set proper ownership and permissions during the build
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
-
-# Set the default working directory
-WORKDIR /var/www/html
-
-# Set the command to run the configuration script
-CMD ["/config.sh"]
-
+ENTRYPOINT [ "/config.sh" ]

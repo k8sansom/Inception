@@ -1,43 +1,50 @@
-# Variables
-DOCKER_COMPOSE = sudo docker-compose
-COMPOSE_FILE = ./srcs/docker-compose.yml
-WEB_DIR = ./srcs/web
+NAME := inception
 
-# Targets
-.PHONY: all up build start stop down clean fclean re
+WP_VOLUME := /home/${USER}/data/wordpress
+MARIADB_VOLUME := /home/${USER}/data/mariadb
+DOCKER_COMPOSE_FILE := ./srcs/docker-compose.yml
 
-# Default target: build and start services
-all: build up
+DOCKER_COMPOSE := docker compose -f $(DOCKER_COMPOSE_FILE)
 
-# Build services
-build:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) build
+all: $(NAME)
 
-# Start services in the foreground
-up:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up
+$(NAME): create-volumes
+	$(DOCKER_COMPOSE) up --build
 
-# Start services in detached mode
-start:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d
+create-volumes:
+	mkdir -p $(WP_VOLUME) $(MARIADB_VOLUME)
 
-# Stop services
-stop:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) stop
+up: create-volumes
+	$(DOCKER_COMPOSE) up -d --build
 
-# Stop and remove containers, networks, and volumes
 down:
-	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down
+	$(DOCKER_COMPOSE) down
 
-# Clean up unused Docker resources (containers, images, volumes)
+stop:
+	$(DOCKER_COMPOSE) stop
+
+start:
+	$(DOCKER_COMPOSE) start
+
+restart: down up
+
+logs:
+	$(DOCKER_COMPOSE) logs
+
+ps:
+	$(DOCKER_COMPOSE) ps
+
 clean:
-	sudo docker system prune -af
-	sudo docker volume prune -f
+	$(DOCKER_COMPOSE) down
+	@docker image prune -f
+	@docker container prune -f
+	@docker network prune -f
+	@docker system prune -af
 
-# Remove all containers, images, and volumes related to the project
-fclean: down
-	@image_ids=$$(sudo docker images -q) && [ -n "$$image_ids" ] && sudo docker rmi -f $$image_ids || echo "No images to remove"
-	sudo docker volume rm $$(sudo docker volume ls -q) || true
+fclean: clean
+	@docker volume prune -af
+	@rm -rf $(WP_VOLUME) $(MARIADB_VOLUME)
 
-# Rebuild and restart services
-re: fclean all
+re: fclean $(NAME)
+
+.PHONY: all up down stop start restart logs ps clean fclean re
