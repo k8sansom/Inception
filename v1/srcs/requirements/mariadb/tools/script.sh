@@ -1,30 +1,42 @@
 #!/bin/bash
 
-echo "start mariadb"
-service mariadb start;
-sleep 2
+ft_wait() {
+  echo "Waiting for MariaDB to be ready..."
+  until mariadb -u root -p$(<"/run/secrets/db_root_password") -e "SELECT 1;" >/dev/null 2>&1; do
+    sleep 1
+  done
+  echo "MariaDB is ready."
+}
 
-echo "create database"
-mariadb -u root -p$(<"/run/secrets/db_root_password")  -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
-sleep 2
+echo "Start MariaDB service"
+service mariadb start
 
-echo "create user"
-mariadb -u root -p$(<"/run/secrets/db_root_password")  -e "CREATE USER IF NOT EXISTS \`$(<"/run/secrets/db_user")\`@'localhost' IDENTIFIED BY '$(<"/run/secrets/db_password")';"
+ft_wait
 
-echo "grant privileges"
-mariadb -u root -p$(<"/run/secrets/db_root_password")  -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`$(<"/run/secrets/db_user")\`@'%' IDENTIFIED BY '$(<"/run/secrets/db_password")';"
+echo "Creating database"
+mariadb -u root -p$(<"/run/secrets/db_root_password") -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
 
-echo "add password for root"
-mariadb -u root -p$(<"/run/secrets/db_root_password")  -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$(<"/run/secrets/db_root_password")';"
-sleep 1
+echo "Creating user"
+mariadb -u root -p$(<"/run/secrets/db_root_password") -e "CREATE USER IF NOT EXISTS \`$(<"/run/secrets/db_user")\`@'localhost' IDENTIFIED BY '$(<"/run/secrets/db_password")';"
 
-echo "reset privileges"
+echo "Granting privileges"
+mariadb -u root -p$(<"/run/secrets/db_root_password") -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`$(<"/run/secrets/db_user")\`@'%' IDENTIFIED BY '$(<"/run/secrets/db_password")';"
+
+echo "Setting root password"
+mariadb -u root -p$(<"/run/secrets/db_root_password") -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$(<"/run/secrets/db_root_password")';"
+
+echo "Flushing privileges"
 mariadb -u root -p$(<"/run/secrets/db_root_password") -e "FLUSH PRIVILEGES;"
-sleep 1
 
-echo "restart mysql"
+echo "Stopping MariaDB to restart in safe mode"
 mysqladmin -u root -p$(<"/run/secrets/db_root_password") shutdown
-sleep 2
 
-echo "exec mariadb"
+# Wait for MariaDB to shut down
+echo "Waiting for MariaDB to shut down..."
+while pgrep mariadbd >/dev/null; do
+  sleep 1
+done
+echo "MariaDB has shut down."
+
+echo "Start MariaDB in safe mode"
 exec mariadbd-safe
