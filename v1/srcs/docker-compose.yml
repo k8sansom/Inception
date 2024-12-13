@@ -53,8 +53,8 @@ services:
       - mariadb_user
       - mariadb_root_pass
       - mariadb_pass
-    # expose:
-    #   - "3306"
+    expose:
+      - "3306"
   
   nginx:
     <<: *default-config
