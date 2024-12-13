@@ -1,4 +1,4 @@
-FROM debian:bullseye-20230901
+FROM debian:bullseye
 
 # Install necessary packages
 RUN apt update -y && apt upgrade -y && \
