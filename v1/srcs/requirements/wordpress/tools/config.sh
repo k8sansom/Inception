@@ -5,7 +5,7 @@ sleep 20
 
 WP_PATH="/var/www/wordpress"
 
-cd var/
+cd /var/
 
 wp config create --allow-root \
                 --dbname=$MYSQL_DATABASE --dbuser=$(<"/run/secrets/mariadb_user") \
