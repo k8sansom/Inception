@@ -1,17 +1,8 @@
 #!/bin/bash
 
-ft_wait() {
-  echo "Waiting for MariaDB to be ready..."
-  until mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "SELECT 1;" >/dev/null 2>&1; do
-    sleep 1
-  done
-  echo "MariaDB is ready."
-}
-
 echo "Start MariaDB service"
 service mariadb start
-
-ft_wait
+sleep 2
 
 echo "Creating database"
 mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
@@ -27,16 +18,11 @@ mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "ALTER USER 'root'@'lo
 
 echo "Flushing privileges"
 mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "FLUSH PRIVILEGES;"
+sleep 1
 
 echo "Stopping MariaDB to restart in safe mode"
 mysqladmin -u root -p$(<"/run/secrets/mariadb_root_pass") shutdown
-
-# Wait for MariaDB to shut down
-echo "Waiting for MariaDB to shut down..."
-while pgrep mariadbd >/dev/null; do
-  sleep 1
-done
-echo "MariaDB has shut down."
+sleep 2
 
 echo "Start MariaDB in safe mode"
 exec mariadbd-safe
