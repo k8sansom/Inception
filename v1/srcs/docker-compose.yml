@@ -2,6 +2,8 @@ x-common: &default-config
   env_file:
     - .env
   restart: on-failure
+  networks:
+    - inception
 
 volumes:
   wordpress:
@@ -47,8 +49,6 @@ services:
       - mariadb_user
       - mariadb_root_pass
       - mariadb_pass
-    networks:
-      - inception
   
   nginx:
     <<: *default-config
@@ -62,8 +62,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "443:443"
-    networks:
-      - inception
   
   wordpress:
     <<: *default-config
@@ -82,8 +80,7 @@ services:
       - wp_user_pass
     depends_on:
       - mariadb
-    networks:
-      - inception
+
 
 networks:
   inception:
