@@ -53,8 +53,6 @@ services:
       - mariadb_user
       - mariadb_root_pass
       - mariadb_pass
-    # expose:
-    #   - "3306"
   
   nginx:
     <<: *default-config
@@ -87,7 +85,3 @@ services:
       - wp_user_pass
     depends_on:
       - mariadb
-    # ports:
-    #   - "8443:443"
-    # expose:
-    #   - "8443"

@@ -3,14 +3,14 @@ trap "exit" TERM
 
 sleep 20
 
-WP_PATH="/var/www/wordpress"
-
 cd /var/
 
 wp config create --allow-root \
-                --dbname=$MYSQL_DATABASE --dbuser=$(<"/run/secrets/mariadb_user") \
-                --dbpass=$(<"/run/secrets/mariadb_pass") --dbhost=$MYSQL_HOSTNAME:3306 \
-                --path=$WP_PATH
+                --dbname=$MYSQL_DATABASE \
+				--dbuser=$(<"/run/secrets/mariadb_user") \
+                --dbpass=$(<"/run/secrets/mariadb_pass") \
+				--dbhost=$MYSQL_HOSTNAME:3306 \
+                --path="/var/www/wordpress"
 
 echo "wp core install......."
 wp core install --allow-root \
@@ -20,12 +20,13 @@ wp core install --allow-root \
             --admin_password=$(<"/run/secrets/wp_admin_pass") \
             --admin_email='katesansomstudio@gmail.com' \
             --skip-email \
-            --path=$WP_PATH
+            --path="/var/www/wordpress"
 
 echo "wp user create........"
 wp user create --allow-root \
-            $(<"/run/secrets/wp_user") katesansomstudio@gmail.com --user_pass=$(<"/run/secrets/wp_user_pass") \
-            --path=$WP_PATH
+            $(<"/run/secrets/wp_user") katesansomstudio@gmail.com \
+			--user_pass=$(<"/run/secrets/wp_user_pass") \
+            --path="/var/www/wordpress"
 
 directory="/run/php"
 
