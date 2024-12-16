@@ -9,7 +9,7 @@ RUN mkdir -p /etc/nginx/ssl /var/www/html && \
     openssl req -x509 -nodes \
         -out /etc/nginx/ssl/inception.crt \
         -keyout /etc/nginx/ssl/inception.key \
-        -subj "/C=FR/ST=Berlin/L=Berlin/O=42/OU=42/CN=ksansom/UID=ksansom/"
+        -subj "/C=FR/ST=Berlin/L=Berlin/O=42/OU=42/CN=ksansom.42.fr/UID=ksansom/"
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
