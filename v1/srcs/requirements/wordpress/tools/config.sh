@@ -18,7 +18,7 @@ wp core install --allow-root \
             --title='inception' \
             --admin_user=$(<"/run/secrets/wp_admin") \
             --admin_password=$(<"/run/secrets/wp_admin_pass") \
-            --admin_email='katesansomstudio@gmail.com' \
+            --admin_email='ksansom@42berlin.com' \
             --skip-email \
             --path="/var/www/wordpress"
 
