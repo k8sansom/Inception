@@ -3,11 +3,6 @@ x-common: &default-config
     - .env
   restart: on-failure
 
-
-networks:
-  inception:
-    driver: bridge
-
 volumes:
   wordpress:
     driver: local
@@ -89,3 +84,7 @@ services:
       - mariadb
     networks:
       - inception
+
+networks:
+  inception:
+    driver: bridge
