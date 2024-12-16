@@ -40,6 +40,7 @@ services:
   mariadb:
     <<: *default-config
     container_name: mariadb
+    image: mariadb
     volumes:
       - mariadb:/var/lib/mysql
     build:
@@ -53,6 +54,7 @@ services:
   nginx:
     <<: *default-config
     container_name: nginx
+    image: nginx
     depends_on:
       - wordpress
     volumes:
@@ -62,11 +64,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "443:443"
-      - "8080:8080"
+      # - "8080:8080"
   
   wordpress:
     <<: *default-config
     container_name: wordpress
+    image: wordpress
     volumes:
     - wordpress:/var/www/wordpress
     build:
@@ -81,7 +84,6 @@ services:
       - wp_user_pass
     depends_on:
       - mariadb
-
 
 networks:
   inception:
