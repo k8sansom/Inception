@@ -15,6 +15,7 @@ mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "GRANT ALL PRIVILEGES 
 
 echo "Setting root password"
 mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$(<"/run/secrets/mariadb_root_pass")';"
+sleep 1
 
 echo "Flushing privileges"
 mariadb -u root -p$(<"/run/secrets/mariadb_root_pass") -e "FLUSH PRIVILEGES;"
