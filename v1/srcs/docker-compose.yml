@@ -87,3 +87,4 @@ services:
 networks:
   inception:
     driver: bridge
+    name: inception
