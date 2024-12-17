@@ -1,0 +1,71 @@
+1. How Docker and docker-compose work
+Imagine you're delivering an app to someone, but instead of just sending the app itself, you also send everything it needs to work (e.g., code, dependencies, libraries, configuration). Docker wraps all of this into a single "container." Here’s a simple explanation of Docker and Docker Compose:
+Docker:
+Docker is like a shipping container system for your applications. Imagine you're delivering an app to someone, but instead of just sending the app itself, you also send everything it needs to work (e.g., code, dependencies, libraries, configuration). Docker wraps all of this into a single "container."
+Example:
+You write a Python app.
+You create a Dockerfile that says:
+"Install Python, copy my app into the container, and run it."
+You build an image from the Dockerfile.
+You run the image as a container. Your app now runs in an isolated environment.
+
+docker-compose:
+Docker Compose is a tool to manage multiple Docker containers at once, where you can store values like port access, dependencies, and environment variables
+
+2. Difference between Docker image used with docker-compose and without:
+Use Docker Compose when managing multi-container applications or needing repeatable, sharable, and version-controlled configurations.
+Use docker run without Compose for quick, single-container scenarios or debugging
+
+3. Benefit of docker compared to VMs
+- Lightweight and Faster Startup
+- minimal resources since they don’t bundle an entire OS
+- Containers run consistently across different environments.
+- Docker is ideal for fast, efficient, and scalable application deployment, especially for microservices, CI/CD workflows, and cloud-native environments.
+- VMs are better suited when you need complete OS isolation or want to run multiple operating systems on the same hardware
+
+4. Importance of directory structure: 
+Separation of Concerns: Clear distinction between app code, configurations, and Docker-related files.
+Multi-Container Management: Better orchestration with docker-compose.
+Maintainability: Easy to update and extend.
+Build Efficiency: Optimizes the Docker build context.
+Portability: Supports reusability and sharing.
+
+5. Simple explanation of docker-network:
+Docker networking allows containers (isolated applications) to
+communicate with each other and the outside world.
+When you create and run containers, they can be connected to Docker
+networks so they can exchange data or be accessed as needed.
+Bridge Network (default)
+Used when you run a container without specifying a network.
+Containers on the same bridge network can talk to each other using
+container names.
+
+6. show that service can't be accessed via port 80:
+curl -v http://localhost
+
+7. show that I used a TLS v1.3 certificate:
+Verify Using a Web Browser
+Open your site in a web browser (e.g., Chrome or Firefox) via
+https://your-domain.com.
+Click on the lock icon in the address bar.
+View the Certificate or Connection Details.
+The browser will display the TLS version (e.g., TLS 1.2 or TLS 1.3).
+
+8. sign in as wordpress administrator and change something:
+http://ksansom.42.fr/wp-login.php
+ksansom
+forgetIT
+pages or comments
+
+9. login to database:
+try: mysql -u root -p
+empty password
+mysql -u wordpress -p
+forgetIT
+SHOW DATABASES;
+USE wordpress;
+SHOW TABLES;
+SELECT * FROM wp_comments LIMIT 3;
+
+10. reboot the vm:
+reboot and run make start
